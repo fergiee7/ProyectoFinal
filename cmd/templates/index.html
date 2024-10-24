@@ -1,0 +1,422 @@
+{{ define "index.html" }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ .title }}</title>
+</head>
+
+<body>
+  <h1>Gestión de Estudiantes, Materias y Calificaciones</h1>
+
+  <!-- Sección de Estudiantes -->
+  <section>
+    <h2>Estudiantes</h2>
+    <h3>Total de estudiantes registrados: {{ .total_users }}</h3>
+    <form id="student-form">
+      <label for="name">
+        Nombre:
+        <input type="text" name="name" required>
+      </label>
+      <label for="group">
+        Grupo:
+        <input type="text" name="group" required>
+      </label>
+      <label for="email">
+        Email:
+        <input type="email" name="email" required>
+      </label>
+      <button type="submit">Guardar Estudiante</button>
+    </form>
+    <ul id="student-list"></ul>
+  </section>
+
+  <!-- Sección de Materias -->
+  <section>
+    <h2>Materias</h2>
+    <form id="subject-form">
+      <label for="name">
+        Nombre de la Materia:
+        <input type="text" name="name" required>
+      </label>
+      <button type="submit">Guardar Materia</button>
+    </form>
+    <ul id="subject-list"></ul>
+  </section>
+
+  <!-- Sección de Calificaciones -->
+  <section>
+    <h2>Calificaciones</h2>
+    <form id="grade-form">
+      <label for="student_id">
+        ID de Estudiante:
+        <input type="number" name="student_id" required>
+      </label>
+      <label for="subject_id">
+        ID de Materia:
+        <input type="number" name="subject_id" required>
+      </label>
+      <label for="grade">
+        Calificación:
+        <input type="number" step="0.01" name="grade" required>
+      </label>
+      <button type="submit">Guardar Calificación</button>
+    </form>
+    <ul id="grade-list"></ul>
+  </section>
+
+  <script>
+    // Variables para el estado de edición
+    let isEditingStudent = false;
+    let currentStudentId = null;
+    let isEditingSubject = false;
+    let currentSubjectId = null;
+    let isEditingGrade = false;
+    let currentGradeId = null;
+
+    // Obtener referencias a los formularios
+    const studentForm = document.getElementById('student-form');
+    const subjectForm = document.getElementById('subject-form');
+    const gradeForm = document.getElementById('grade-form');
+
+    // Obtener referencias a las listas
+    const studentList = document.getElementById('student-list');
+    const subjectList = document.getElementById('subject-list');
+    const gradeList = document.getElementById('grade-list');
+
+    // Función para agregar o editar un estudiante
+    studentForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData(studentForm);
+      const studentData = Object.fromEntries(formData);
+
+      let url = '/api/students';
+      let method = 'POST';
+
+      if (isEditingStudent) {
+        url = `/api/students/${currentStudentId}`;
+        method = 'PUT';
+      }
+
+      await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(studentData)
+      });
+
+      getStudents(); // Actualiza la lista de estudiantes
+      studentForm.reset(); // Limpia el formulario
+      isEditingStudent = false;
+      currentStudentId = null;
+    });
+
+    // Función para agregar o editar una materia
+    subjectForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData(subjectForm);
+      const subjectData = Object.fromEntries(formData);
+
+      let url = '/api/subjects';
+      let method = 'POST';
+
+      if (isEditingSubject) {
+        url = `/api/subjects/${currentSubjectId}`;
+        method = 'PUT';
+      }
+
+      await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(subjectData)
+      });
+
+      getSubjects(); // Actualiza la lista de materias
+      subjectForm.reset(); // Limpia el formulario
+      isEditingSubject = false;
+      currentSubjectId = null;
+    });
+
+    // Función para agregar o editar una calificación
+    gradeForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const formData = new FormData(gradeForm);
+      const gradeData = Object.fromEntries(formData);
+      
+      let url = '/api/grades';
+      let method = 'POST';
+
+      if (isEditingGrade) {
+        url = `/api/grades/${currentGradeId}`;
+        method = 'PUT';
+      }
+
+      await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(gradeData)
+      });
+
+      getGrades(); // Actualiza la lista de calificaciones
+      gradeForm.reset(); // Limpia el formulario
+      isEditingGrade = false;
+      currentGradeId = null;
+    });
+
+    // Función para obtener estudiantes
+    async function getStudents() {
+      const response = await fetch('/api/students');
+      const students = await response.json();
+      studentList.innerHTML = ''; // Limpiar la lista
+      students.forEach(student => {
+        const li = document.createElement('li');
+        li.innerHTML = `ID: ${student.student_id}, Nombre: ${student.name}, Grupo: ${student.group}, Email: ${student.email}
+                        <button onclick="editStudent(${student.student_id})">Editar</button>
+                        <button onclick="deleteStudent(${student.student_id})">Eliminar</button>`;
+        studentList.appendChild(li);
+      });
+    }
+
+    // Función para obtener materias
+    async function getSubjects() {
+      const response = await fetch('/api/subjects');
+      const subjects = await response.json();
+      subjectList.innerHTML = ''; // Limpiar la lista
+      subjects.forEach(subject => {
+        const li = document.createElement('li');
+        li.innerHTML = `ID: ${subject.id_subject}, Nombre: ${subject.name}
+                        <button onclick="editSubject(${subject.id_subject})">Editar</button>
+                        <button onclick="deleteSubject(${subject.id_subject})">Eliminar</button>`;
+        subjectList.appendChild(li);
+      });
+    }
+
+    // Función para obtener calificaciones
+    async function getGrades() {
+      const response = await fetch('/api/grades');
+      const grades = await response.json();
+      gradeList.innerHTML = ''; // Limpiar la lista
+      grades.forEach(grade => {
+        const li = document.createElement('li');
+        li.innerHTML = `ID Estudiante: ${grade.student_id}, ID Materia: ${grade.subject_id}, Calificación: ${grade.grade} 
+                        <button onclick="editGrade(${grade.grade_id})">Editar</button>
+                        <button onclick="deleteGrade(${grade.grade_id})">Eliminar</button>`;
+        gradeList.appendChild(li);
+      });
+    }
+
+    // Función para cargar los datos de un estudiante en el formulario para editar
+    function editStudent(id) {
+      currentStudentId = id;
+      isEditingStudent = true;
+
+      // Llamada a la API para obtener los datos del estudiante
+      fetch(`/api/students/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          studentForm.name.value = data.name;
+          studentForm.group.value = data.group;
+          studentForm.email.value = data.email;
+        });
+    }
+
+    // Función para cargar los datos de una materia en el formulario para editar
+    function editSubject(id) {
+      currentSubjectId = id;
+      isEditingSubject = true;
+
+      // Llamada a la API para obtener los datos de la materia
+      fetch(`/api/subjects/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          subjectForm.name.value = data.name;
+        });
+    }
+
+    // Función para cargar los datos de una calificación en el formulario para editar
+    function editGrade(id) {
+      currentGradeId = id;
+      isEditingGrade = true;
+
+      // Llamada a la API para obtener los datos de la calificación
+      fetch(`/api/grades/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          gradeForm.student_id.value = data.student_id;
+          gradeForm.subject_id.value = data.subject_id;
+          gradeForm.grade.value = data.grade;
+        });
+    }
+
+    // Función para eliminar un estudiante
+    async function deleteStudent(id) {
+      await fetch(`/api/students/${id}`, { method: 'DELETE' });
+      getStudents(); // Actualiza la lista
+    }
+
+    // Función para eliminar una materia
+    async function deleteSubject(id) {
+      await fetch(`/api/subjects/${id}`, { method: 'DELETE' });
+      getSubjects(); // Actualiza la lista
+    }
+
+    // Función para eliminar una calificación
+    async function deleteGrade(id) {
+      await fetch(`/api/grades/${id}`, { method: 'DELETE' });
+      getGrades(); // Actualiza la lista
+    }
+
+    // Llamar a las funciones para cargar datos al cargar la página
+    getStudents();
+    getSubjects();
+    getGrades();
+  </script>
+</body>
+
+<style>
+  :root {
+      --primary-color: rgb(199, 130, 2);
+      --secondary-color: #f5f5f5;
+      --text-color: #333;
+      --spacing: 20px;
+  }
+
+  * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+  }
+
+  body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing);
+      background-color: #f9f9f9;
+  }
+
+  h1 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2.2rem;
+  }
+
+  h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 0.5rem;
+  }
+
+  h3 {
+      color: #34495e;
+      margin-bottom: 1rem;
+  }
+
+  section {
+      background: white;
+      padding: var(--spacing);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+  }
+
+  form {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+      form {
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+  }
+
+  label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-weight: 500;
+  }
+
+  input {
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+  }
+
+  input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+
+  button {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+  }
+
+  button:hover {
+      background-color: orange;
+  }
+
+  ul {
+      list-style: none;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 1rem;
+      max-height: 300px;
+      overflow-y: auto;
+  }
+
+  li {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+  }
+
+  li:last-child {
+      border-bottom: none;
+  }
+
+  @media (max-width: 768px) {
+      body {
+          padding: 10px;
+      }
+
+      section {
+          padding: 15px;
+      }
+
+      h1 {
+          font-size: 1.8rem;
+      }
+
+      form {
+          grid-template-columns: 1fr;
+      }
+  }
+</style>
+
+
+
+</html>
+{{ end }}
