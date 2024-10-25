@@ -14,9 +14,8 @@ Asegúrate de tener instalados los siguientes programas:
 
 1. Descargar el Proyecto
    
- Clonar el Repositorio:  
-   Clona el repositorio en tu máquina local ejecutando el siguiente comando:
-   git clone [https://github.com/fergiee7/ProyectoFinal.git]
+  Clona el repositorio en tu máquina local ejecutando el siguiente comando:
+git clone https://github.com/fergiee7/ProyectoFinal.git
 
 Ingresar al Directorio del Proyecto
    
