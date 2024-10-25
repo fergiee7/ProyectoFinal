@@ -3,6 +3,11 @@ Entrega del proyecto final de Taller de Go
 
 Este proyecto incluye la configuración de un contenedor Docker y su conexión con DBeaver para gestionar una base de datos MySQL. A continuación se detallan los pasos para descargar, configurar y ejecutar el proyecto.
 
+#Integrantes
+María Fenanda Martínez May
+Luis Joel 
+Ángel
+
 Instrucciones
 
 Requisitos Previos
