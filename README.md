@@ -1,41 +1,68 @@
-# ProyectoFinal
-Entrega del proyecto final de taller de GO
+# Proyecto Final  
+Entrega del proyecto final de Taller de Go
 
-Este proyecto incluye la configuración de un contenedor Docker y está conectado con DBeaver para gestionar la base de datos. A continuación se detallan los pasos para configurar y ejecutar el proyecto.
+Este proyecto incluye la configuración de un contenedor Docker y su conexión con DBeaver para gestionar una base de datos MySQL. A continuación se detallan los pasos para descargar, configurar y ejecutar el proyecto.
 
-##INSTRUCCIONES
+Instrucciones
 
-Requisitos previos
-Asegúrate de tener instalado lo siguiente:
+Requisitos Previos
+Asegúrate de tener instalados los siguientes programas:
+- Go (versión 1.16 o superior)
+- Git
+- Docker
+- DBeaver (para gestionar la base de datos MySQL)
 
-Go (versión 1.16 o superior)
-Git
-Docker
-DBeaver (para gestionar la base de datos MySQL)
+1. Descargar el Proyecto
+   
+ Clonar el Repositorio:  
+   Clona el repositorio en tu máquina local ejecutando el siguiente comando:
+   git clone https://github.com/tu_usuario/proyecto_golang.git
 
-1. Acceder al repositorio
-Clona el repositorio en tu máquina local:
+Ingresar al Directorio del Proyecto
+   
+   Cambia al directorio del proyecto clonado:
+   cd proyecto_golang
 
-git clone https://github.com/tu_usuario/proyecto_golang.git
-## 1. Crear contenedor en docker
-Crea un contenedor en docker con el nombre de mysql
-Colocale el nombre de usuario:root constraseña:test
+2. Crear Contenedor en Docker
+   
+   Crea un contenedor en Docker para MySQL con las siguientes configuraciones:
+   - Nombre del contenedor: my-sql
+   - Usuario: root
+   - Contraseña: test
+   
+   Ejecuta el siguiente comando para crear el contenedor:
+   docker run --name mysql -e MYSQL_ROOT_PASSWORD=test -d mysql:latest
+   ¡Recuerda que debes iniciar el contenedor cada vez que lo uses!
 
-Configuración de DBeaver
-Abre DBeaver y crea una nueva conexión a la base de datos MySQL.
+3. Configuración de DBeaver
+   
+   Abre DBeaver y crea una nueva conexión a la base de datos MySQL. Configura la conexión con los siguientes parámetros:
+   - Nombre base de datos: proyecto_1
+   - Host: localhost
+   - Port: 8001
+   - Username: root
+   - Password: test
+   
+   Una vez conectado, podrás ver y gestionar las tablas del proyecto. En el archivo main encontrarás el backend y en el archivo index el frontend.
 
-Configura la conexión usando los siguientes parámetros:
+   Cualquier cambio en la base de datos modifícalo en la línea 38:
+   
+   dsn := "root:test@tcp(127.0.0.1:3306)/proyecto_1?charset=utf8mb4&parseTime=True&loc=Local"
 
-Host: localhost 
-Port: 8001 
-Username: root 
-Password: test 
+4. Corriendo el Programa:
+   Dale click en debug y listo.
+   
+   Para utilizar y/o actualizar este proyecto:
+   1. Haz un fork del proyecto.
+   2. Crea una nueva rama:
+      git checkout -b feature/nueva-funcionalidad
+   3. Realiza tus cambios y haz un commit:
+      git commit -am 'Añadir nueva funcionalidad'
+      
+   5. Sube los cambios:
+      git push origin feature/nueva-funcionalidad
+      
+   7. Crea un Pull Request.
 
-Una vez conectada la base de datos, podrás ver y gestionar las tablas del proyecto.
 
-Para utilizar este proyecto :
-Haz un fork del proyecto.
-Crea una nueva rama (git checkout -b feature/nueva-funcionalidad).
-Realiza tus cambios y haz un commit (git commit -am 'Añadir nueva funcionalidad').
-Sube los cambios (git push origin feature/nueva-funcionalidad).
-Crea un Pull Request.
+   
